@@ -10,13 +10,18 @@ public:
     virtual ~MonitorBase() = default;   // Hey Compiler. Please help to generate the default destructor functon.
                                         // Also think about the keyword 'delete'
                                         // In parent class, destructor must be virtual.
-    
+   
+    // Pure virtual functions
+    // Must implemented in Child classes
+    virtual std::string name() const = 0;
 };
 
-// final means that the inheritance 'stops' here, the child class is permitted to derive (impossible to have its child class)
+// final means that the inheritance 'stops' here, the child class is prohibitted to derive (impossible to have its child class)
 class CpuMonitor final : public MonitorBase {
 public:
     explicit CpuMonitor(double warn_threshold = 70.0);
+
+    std::string name() const override;
 private:
     double warn_threshold_;
 };
@@ -24,6 +29,8 @@ private:
 class MemoryMonitor final : public MonitorBase {
 public:
     explicit MemoryMonitor(uint64_t warn_bytes =  256ULL * 1024 * 1024);
+
+    std::string name() const override;
 private:
     uint64_t warn_bytes_;
 };
@@ -31,6 +38,8 @@ private:
 class CompositeMonitor final : public MonitorBase {
 public:
     CompositeMonitor();
+
+    std::string name() const override;
 private:
     CpuMonitor cpu_;
     MemoryMonitor memory_;

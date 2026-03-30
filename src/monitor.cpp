@@ -1,0 +1,45 @@
+#include "monitor.h"
+
+CpuMonitor::CpuMonitor(double warn_threshold)
+    : warn_threshold_(warn_threshold) {}
+
+std::string CpuMonitor::name() const{
+    return "CpuMonitor";
+}
+
+MemoryMonitor::MemoryMonitor(uint64_t warn_bytes)
+    : warn_bytes_(warn_bytes) {}
+
+std::string MemoryMonitor::name() const{
+    return "MemoryMonitor";
+}
+
+CompositeMonitor::CompositeMonitor()
+    : cpu_(70.0), memory_(256ULL * 1024 * 1024) {}
+
+std::string CompositeMonitor::name() const {
+    return "CompositeMonitor";
+}
+
+static std::unique_ptr<MonitorBase>
+MonitorFactory::create(MonitorFactory::Type type)   // Don't forget MonitorFactory before 'Type', because Type is defined in the class MonitorFactory
+{
+    switch(type) {
+        case Type::CPU:
+            return std::make_unique<CpuMonitor>();
+        case Type::MEMORY:
+            return std::make_unique<MemoryMonitor>();
+        case Type::COMPOSITE:
+            return std::make_unique<CompositeMonitor>();
+    }
+    throw std::invalid_argument("MonitorFactory: Unknown type");
+}
+
+static std::unique_ptr<MonitorBase>
+MonitorFactory::create(const std:string& type_str)
+{
+    if(type_str == "cpu") return create(Type::CPU);
+    else if(type_str == "memory") return create(Type::MEMORY);
+    else if(type_str == "composite") return create(Type::COMPOSITE);
+    else throw std::invalid_argument("MonitorFactory: Unknown type string: " + type_str);
+}

@@ -32,5 +32,13 @@ int main(void)
         proc_init(&procs[i], 1000 + i * 100, proc_names[i]);
     }
 
+    // Factory function to create monitors
+    std::vector<std::unique_ptr<MonitorBase>> monitors;
+    monitors.push_back(MonitorFactory::create(MonitorFactory::Type::CPU));
+    monitors.push_back(MonitorFactory::create(MonitorFactory::Type::MEMORY));
+    monitors.push_back(MonitorFactory::create("composite"));
+
+    log->info("Created" + std::to_string(monitors.size()) + " monitors via factory.");
+
 	return 0;
 }

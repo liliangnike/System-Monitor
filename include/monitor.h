@@ -4,6 +4,8 @@
 #include <memory>
 #include <cstdint>
 
+#include "process_info.h"
+
 class MonitorBase {
 public:
     MonitorBase() = default
@@ -14,6 +16,10 @@ public:
     // Pure virtual functions
     // Must implemented in Child classes
     virtual std::string name() const = 0;
+    virtual void collect(process_info_t& proc) = 0;
+    virtual std::string report(const process_info_t& proc) const = 0;
+
+    void run(process_info_t& proc);
 };
 
 // final means that the inheritance 'stops' here, the child class is prohibitted to derive (impossible to have its child class)
@@ -22,6 +28,8 @@ public:
     explicit CpuMonitor(double warn_threshold = 70.0);
 
     std::string name() const override;
+    void collect(process_info_t& proc) override;
+    std::string report(const process_info_t& proc) const override;
 private:
     double warn_threshold_;
 };
@@ -31,6 +39,8 @@ public:
     explicit MemoryMonitor(uint64_t warn_bytes =  256ULL * 1024 * 1024);
 
     std::string name() const override;
+    void collect(process_info_t& proc) override;
+    std::string report(const process_info_t& proc) const override;
 private:
     uint64_t warn_bytes_;
 };
@@ -40,6 +50,8 @@ public:
     CompositeMonitor();
 
     std::string name() const override;
+    void collect(process_info_t& proc) override;
+    std::string report(const process_info_t& proc) const override;
 private:
     CpuMonitor cpu_;
     MemoryMonitor memory_;

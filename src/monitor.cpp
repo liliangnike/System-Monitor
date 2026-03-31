@@ -1,4 +1,12 @@
+#include "logger.h"
 #include "monitor.h"
+
+MonitorBase::run(process_info_t& proc)
+{
+    collect(proc);
+    std::string res = report(proc);
+    Logger::instance()->info(res);
+}
 
 CpuMonitor::CpuMonitor(double warn_threshold)
     : warn_threshold_(warn_threshold) {}

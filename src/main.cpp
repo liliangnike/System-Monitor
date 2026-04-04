@@ -29,7 +29,7 @@ int main(void)
 
     std::vector<process_info_t> procs(PROC_COUNT);
     for (i = 0; i < PROC_COUNT; i++) {
-        proc_init(&procs[i], 1000 + i * 100, proc_names[i]);
+        init_proc(&procs[i], 1000 + i * 100, proc_names[i]);
     }
 
     // Factory function to create monitors

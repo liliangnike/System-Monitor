@@ -15,6 +15,11 @@ std::string CpuMonitor::name() const{
     return "CpuMonitor";
 }
 
+void CpuMonitor::collect(process_info_t& proc)
+{
+
+}
+
 MemoryMonitor::MemoryMonitor(uint64_t warn_bytes)
     : warn_bytes_(warn_bytes) {}
 

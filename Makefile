@@ -30,8 +30,8 @@ CXX_SRCS  := $(wildcard $(SRC_DIR)/*.cpp)
 
 # Source file -> Object files
 # patsubst(3 arguments): pattern, replacement, texts
-C_OBJS    := $(patsubst $(SRC_DIR)/%.c, $(OBJ_DIR)%.o, $(C_SRCS))
-CXX_OBJS  := $(patsubst $(SRC_DIR)/%.cpp, $(OBJ_DIR)%.o, $(CXX_SRCS))
+C_OBJS    := $(patsubst $(SRC_DIR)/%.c, $(OBJ_DIR)/%.o, $(C_SRCS))
+CXX_OBJS  := $(patsubst $(SRC_DIR)/%.cpp, $(OBJ_DIR)/%.o, $(CXX_SRCS))
 ALL_OBJS  := $(C_OBJS) $(CXX_OBJS)
 
 .PHONY: all

@@ -1,7 +1,10 @@
 #include <iostream>
 #include <cstdlib>
+#include <vector>
 
 #include "logger.h"
+#include "monitor.h"
+#include "process_info.h"
 
 static void alert_callback(const process_info_t* p, const char* msg)
 {
@@ -28,7 +31,7 @@ int main(void)
                                     // constexpr means that the variable can be calculated out during compilation phase
 
     std::vector<process_info_t> procs(PROC_COUNT);
-    for (i = 0; i < PROC_COUNT; i++) {
+    for (int i = 0; i < PROC_COUNT; i++) {
         init_proc(&procs[i], 1000 + i * 100, proc_names[i]);
     }
 
@@ -65,7 +68,7 @@ int main(void)
     log->info("=== Show Process Information ===");
     for (const auto& proc:procs) {
         // C function
-        show_proc(&proc)
+        show_proc(&proc);
     }
 
 	return 0;

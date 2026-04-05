@@ -1,7 +1,7 @@
 #include "logger.h"
 #include "monitor.h"
 
-MonitorBase::run(process_info_t& proc)
+void MonitorBase::run(process_info_t& proc)
 {
     collect(proc);
     std::string res = report(proc);
@@ -34,7 +34,9 @@ std::string CompositeMonitor::name() const {
     return "CompositeMonitor";
 }
 
-static std::unique_ptr<MonitorBase>
+
+// No need to add 'static' keyword for the static function implementation
+std::unique_ptr<MonitorBase>
 MonitorFactory::create(MonitorFactory::Type type)   // Don't forget MonitorFactory before 'Type', because Type is defined in the class MonitorFactory
 {
     switch(type) {
@@ -48,8 +50,8 @@ MonitorFactory::create(MonitorFactory::Type type)   // Don't forget MonitorFacto
     throw std::invalid_argument("MonitorFactory: Unknown type");
 }
 
-static std::unique_ptr<MonitorBase>
-MonitorFactory::create(const std:string& type_str)
+std::unique_ptr<MonitorBase>
+MonitorFactory::create(const std::string& type_str)
 {
     if(type_str == "cpu") return create(Type::CPU);
     else if(type_str == "memory") return create(Type::MEMORY);

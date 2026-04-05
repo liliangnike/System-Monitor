@@ -13,7 +13,7 @@ enum class LogLevel : char {
     WARNING,
     ERROR,
     CRITICAL
-}
+};
 
 class Logger {
 public:

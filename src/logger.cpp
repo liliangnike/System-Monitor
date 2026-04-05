@@ -1,5 +1,5 @@
 #include <iostream>
-#include <ipmanip>
+#include <iomanip>
 #include <chrono>
 #include <sstream>
 #include "logger.h"
@@ -32,10 +32,10 @@ void Logger::set_loglevel(LogLevel level)
     // std::vector<int> v(10)
     std::lock_guard<std::mutex> lock(mutex_);
 
-    _min_level = level;
+    min_level_ = level;
 }
 
-void set_log_file(const std::string& path)
+void Logger::set_log_file(const std::string& path)
 {
     std::lock_guard<std::mutex> lock(mutex_);
     if (file_.is_open()) {
@@ -74,7 +74,7 @@ std::string Logger::get_level_name(LogLevel level)
     return "UNKNOWN";
 }
 
-std::string Logger:get_current_timestamp()
+std::string Logger::get_current_timestamp()
 {
     // using namespace std::chrono;
 
@@ -84,7 +84,7 @@ std::string Logger:get_current_timestamp()
     auto ms = std::chrono::duration_cast<std::chrono::milliseconds>(now.time_since_epoch()) % 1000;
 
     std::ostringstream oss;
-    oss << std.put_time(std::localtime(&tt), "%H:%M:%S")
+    oss << std::put_time(std::localtime(&tt), "%H:%M:%S")
         << "." << std::setfill('0') << std::setw(3) << ms.count();
 
     return oss.str();
@@ -93,7 +93,7 @@ std::string Logger:get_current_timestamp()
 void Logger::log(LogLevel level, const std::string& msg)
 {
     std::lock_guard<std::mutex> lock(mutex_);
-    if (level < mim_level_) return;
+    if (level < min_level_) return;
 
     std::string line = "[" + get_current_timestamp() + "][" + get_level_name(level) + "]" + msg;
 

@@ -8,7 +8,7 @@
 
 class MonitorBase {
 public:
-    MonitorBase() = default
+    MonitorBase() = default;
     virtual ~MonitorBase() = default;   // Hey Compiler. Please help to generate the default destructor functon.
                                         // Also think about the keyword 'delete'
                                         // In parent class, destructor must be virtual.
@@ -62,10 +62,10 @@ public:
     // No need to instantiation. Member functions could be 'static' type
     MonitorFactory() = delete;
 
-    enum class Type = {CPU, MEMORY, COMPOSITE};
+    enum class Type {CPU, MEMORY, COMPOSITE};
 
     static std::unique_ptr<MonitorBase> create(Type type);
-    static std::unique_ptr<MonitorBase> create(const std:string& type_str);  // pass by reference (no copy). What's the difference with 'pass by value'?
+    static std::unique_ptr<MonitorBase> create(const std::string& type_str);  // pass by reference (no copy). What's the difference with 'pass by value'?
 };
 
 #endif

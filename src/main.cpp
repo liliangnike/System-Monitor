@@ -40,5 +40,33 @@ int main(void)
 
     log->info("Created" + std::to_string(monitors.size()) + " monitors via factory.");
 
+    log->info("=== Monitoring round ===");
+    /*
+     * C++ auto keyword:
+     * 1. auto elem:vector -> value copy and does not modify value in the vector
+     * 2. auto& elem:vector -> no value copy and could modify value in the vector (reference)
+     * 3. const auto& elem:vector -> no value copy and could not modify value in the vector
+     */
+    for (auto& proc:procs) {
+        for (auto& monitor:monitors) {
+            try {
+                // Call base class virtual function
+                // During program run, associate child class function will be called
+                monitor->run(proc);
+            } catch (const std::exception& e) {
+                log->error("Monitor threw: " + std::string(e.what()));
+            }
+        }
+        
+        // C function
+        check_proc_thresholds(&proc, 60.0, 300ULL * 1024 * 1024);
+    }
+
+    log->info("=== Show Process Information ===");
+    for (const auto& proc:procs) {
+        // C function
+        show_proc(&proc)
+    }
+
 	return 0;
 }

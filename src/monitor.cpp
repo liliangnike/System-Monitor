@@ -1,3 +1,5 @@
+#include <sstream>
+#include <iomanip>
 #include "logger.h"
 #include "monitor.h"
 
@@ -17,7 +19,21 @@ std::string CpuMonitor::name() const{
 
 void CpuMonitor::collect(process_info_t& proc)
 {
+    proc.cpu_usage = sample_proc_cpu(proc.pid);
+    if (proc.cpu_usage > warn_threshold_) {
+        Logger::instance()->warn("High CPU: " + name() + ", pid = " + std::to_string(proc.pid));
+    }
+}
 
+std::string CpuMonitor::report(const process_info_t& proc) const
+{
+    std::ostringstream oss;
+    oss << "[CPU ] pid = " << proc.pid
+        << " name = " << proc.name
+        << " cpu = " << std::fixed << std::setprecision(1)
+        << proc.cpu_usage << "%";
+
+    return oss.str();
 }
 
 MemoryMonitor::MemoryMonitor(uint64_t warn_bytes)

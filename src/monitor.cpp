@@ -43,6 +43,24 @@ std::string MemoryMonitor::name() const{
     return "MemoryMonitor";
 }
 
+void MemoryMonitor::collect(process_info_t& proc)
+{
+    proc.mem_bytes = sample_proc_mem(proc.pid);
+    if (proc.mem_bytes > warn_bytes_) {
+        Logger::instance()->warn("High MEM: " + name() + ", pid = " + std::to_string(proc.pid));
+    }
+}
+
+std::string MemoryMonitor::report(const process_info_t& proc) const
+{
+    std::ostringstream oss;
+    oss << "[MEM ] pid = " << proc.pid
+        << " name = " << proc.name
+        << " mem = " << (proc.mem_bytes >> 20) << " MB";
+
+    return oss.str();
+}
+
 CompositeMonitor::CompositeMonitor()
     : cpu_(70.0), memory_(256ULL * 1024 * 1024) {}
 
@@ -50,6 +68,16 @@ std::string CompositeMonitor::name() const {
     return "CompositeMonitor";
 }
 
+void CompositeMonitor::collect(process_info_t& proc)
+{
+    cpu_.collect(proc);
+    memory_.collect(proc);
+}
+
+std::string CompositeMonitor::report(const process_info_t& proc) const
+{
+    return cpu_.report(proc) + "  |  " + memory_.report(proc);
+}
 
 // No need to add 'static' keyword for the static function implementation
 std::unique_ptr<MonitorBase>

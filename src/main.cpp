@@ -41,7 +41,7 @@ int main(void)
     monitors.push_back(MonitorFactory::create(MonitorFactory::Type::MEMORY));
     monitors.push_back(MonitorFactory::create("composite"));
 
-    log->info("Created" + std::to_string(monitors.size()) + " monitors via factory.");
+    log->info("Created " + std::to_string(monitors.size()) + " monitors via factory.");
 
     log->info("=== Monitoring round ===");
     /*

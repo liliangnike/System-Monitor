@@ -71,5 +71,14 @@ int main(void)
         show_proc(&proc);
     }
 
+    // Demo code for exception threw by MonitorFactory function
+    try {
+        auto unknown_monitor = MonitorFactory::create("unknown_type");
+    } catch (const std::invalid_argument& e) {
+        log->warn("Expected exception caught during monitor creation: " + std::string(e.what()));
+    }
+
+    log->info("=== Finished. Total log messages: " + std::to_string(log->get_message_count()) + " ===");
+
 	return 0;
 }

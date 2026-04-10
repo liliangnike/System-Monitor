@@ -16,7 +16,7 @@ void init_proc(process_info_t* p, uint32_t pid, const char* name)
 {
     if (!p) return;
 
-    memset(p, 0, sizeof(p));
+    memset(p, 0, sizeof(*p));
     p->pid = pid;
     p->state = PROC_RUNNING;
     p->start_time = time(NULL);   // how many seconds from 1970-1-1 till now
@@ -68,7 +68,8 @@ void check_proc_thresholds(const process_info_t* p, double cpu_threshold, uint64
     if (p->mem_bytes > mem_threshold) {
         char msg[128];
         snprintf(msg, sizeof(msg), "Memory %llu MB exceeds threshold %llu MB",
-                                    p->mem_bytes, mem_threshold);
+                                    (unsigned long long) (p->mem_bytes >> 20), 
+                                    (unsigned long long) (mem_threshold >> 20));
         g_alert_cb(p, msg);
     }
 }

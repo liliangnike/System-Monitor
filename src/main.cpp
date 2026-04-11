@@ -11,6 +11,17 @@ static void alert_callback(const process_info_t* p, const char* msg)
     Logger::instance()->warn(std::string("[ALERT] ") + msg + " (proc=" + p->name + ")");
 }
 
+static void demo_stl(const std::vector<process_info_t>& procs) 
+{
+    Logger::instance()->info("=== STL, Lambda demo ===");
+}
+
+static void demo_memory()
+{
+    // demo usage of point, reference and smart pointer
+    Logger::instance()->info("=== Memory demo ===");
+}
+
 int main(void)
 {
     std::srand(42);
@@ -70,6 +81,10 @@ int main(void)
         // C function
         show_proc(&proc);
     }
+
+    demo_stl(procs);
+
+    demo_memory();
 
     // Demo code for exception threw by MonitorFactory function
     try {

@@ -20,6 +20,28 @@ static void demo_memory()
 {
     // demo usage of point, reference and smart pointer
     Logger::instance()->info("=== Memory demo ===");
+
+    // stack - local variable
+    process_info_t stack_proc;
+    init_proc(&stack_proc, 9999, "stack_demo");
+
+    // heap - new
+    process_info_t* heap_proc = new process_info_t;
+    init_proc(heap_proc, 8888, "pointer_demo");
+    /*
+     * If delete operator throws exceptions, what will happen?
+     * 1. delete calls destructor function then call operator delete to free memory
+     * 2. C++, when stack unwinding is inprogress, if there is exceptions, calls std::terminate(). Then code will crash. Memory might not be free.
+     * 3. Even though try...catch is used, no exception will be caught. Because std::terminate() is called.
+     */
+    delete heap_proc;
+
+    // unique_ptr - safe, free automatically
+    auto smart = std::make_unique<process_info_t>();
+    init_proc(smart.get(), 7777, "smart_pointer_demo");
+    
+    Logger::instance()->debug("stack process id = " + std::to_string(stack_proc.pid));
+    Logger::instance()->debug("smart process id = " + std::to_string(smart->pid));
 }
 
 int main(void)

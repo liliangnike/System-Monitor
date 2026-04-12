@@ -14,6 +14,24 @@ static void alert_callback(const process_info_t* p, const char* msg)
 static void demo_stl(const std::vector<process_info_t>& procs) 
 {
     Logger::instance()->info("=== STL, Lambda demo ===");
+    
+    // lambda expression (function)
+    // syntax: [capture list](parameter list) -> return value type { function body }
+    //
+    // C++ compiler consider lambda as one class
+    // capture list: data member
+    // parameter list: member function parameter list
+    // return type: return data type, optional (think about Python)
+    // function body: implementation
+    //
+    auto high_cpu = [](const process_info_t& p){ return p.cpu_usage > 50.0; };
+
+    int count = 0;
+    for (const auto& p : procs) {
+        if (high_cpu(p)) count++;
+    }
+
+    Logger::instance()->info("Number of processes with CPU usage exceeds 50.0%: " + std::to_string(count));
 }
 
 static void demo_memory()
@@ -33,6 +51,8 @@ static void demo_memory()
      * 1. delete calls destructor function then call operator delete to free memory
      * 2. C++, when stack unwinding is inprogress, if there is exceptions, calls std::terminate(). Then code will crash. Memory might not be free.
      * 3. Even though try...catch is used, no exception will be caught. Because std::terminate() is called.
+     *
+     * Never try to raise exception in C++ destructor function.
      */
     delete heap_proc;
 

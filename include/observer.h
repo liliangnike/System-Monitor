@@ -21,8 +21,17 @@ struct AlertEvent {
 // abstract observer interface
 class AlertObserver {
 public:
+    // Must be virtual destructor, if the parent class was used as unified interface
     virtual ~AlertObserver() = default;
+    virtual std::string observer_name() const;
 
+};
+
+class AlertSubject {
+public:
+    void subscribe();
+    void unsubscribe(const std::string& name);
+    void notify();
 };
 
 #endif

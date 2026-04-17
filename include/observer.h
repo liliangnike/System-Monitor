@@ -31,7 +31,11 @@ class AlertSubject {
 public:
     void subscribe();
     void unsubscribe(const std::string& name);
-    void notify();
+    void notify(const AlertEvent& event);
+
+private:
+    // consider using smart pointer?
+    std::vector<AlertObserver*> observers_;
 };
 
 #endif

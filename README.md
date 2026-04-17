@@ -1,2 +1,12 @@
-This repository covers most of important C/C++ knowledge which are frequently asked during interview. 
-Just for revision.
+Demo project for C/C++ knowledge practice:
+- C enum and C++ enum
+- extern "C"
+- static variables and functions
+- mutable variables
+- pass-by-value and pass-by-reference
+- left/right value, std::move
+- C++ class definition (default constructor/desctructor, parameter list initialization, explicit function, const member function.etc)
+- C++ inheritence (final, override)
+- C++ Polymorphism
+- virtual functions (parent class destructor, pure virtual functions)
+- smart pointers (unique_ptr, shared_ptr and weak_ptr)

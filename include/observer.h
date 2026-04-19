@@ -1,6 +1,7 @@
 #ifndef __OBSERVER_HEADER_FILE__
 #define __OBSERVER_HEADER_FILE__
 
+#include <memory>
 #include "process_info.h"
 
 enum class AlertType {
@@ -29,13 +30,22 @@ public:
 
 class AlertSubject {
 public:
-    void subscribe();
+    void subscribe(std::shared_ptr<AlertObserver> observer);
     void unsubscribe(const std::string& name);
     void notify(const AlertEvent& event);
 
 private:
-    // consider using smart pointer?
-    std::vector<AlertObserver*> observers_;
+    std::vector<std::weakr_ptr<AlertObserver>> observers_;
+};
+
+class ConsoleAlertObserver : public AlertObserver {
+public:
+    std::string observer_name() const override { return "ConsoleObserver"; }
+};
+
+class LogAlertObserver : public AlertObserver {
+public:
+    std::string observer_name() const override { return "LogObserver"; }
 };
 
 #endif

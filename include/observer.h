@@ -30,24 +30,37 @@ public:
 
 class AlertSubject {
 public:
-    // generic inteface for external caller function.
+    // generic inteface for external caller function, user shared_ptr here.
     // C++ allows implicit conversion shared_ptr -> weak_ptr, when function is pushing shared_ptr type data back to a vector of weak_ptr, the type is converted implicitly.
     void subscribe(std::shared_ptr<AlertObserver> observer);
     void unsubscribe(const std::string& name);
     void notify(const AlertEvent& event);
 
+    std::size_t observer_size() const;
+
+    void cleanup_expired_observers();
+
 private:
+    // Define weak_ptr type.
     std::vector<std::weakr_ptr<AlertObserver>> observers_;
 };
 
+// print to console
 class ConsoleAlertObserver : public AlertObserver {
 public:
     std::string observer_name() const override { return "ConsoleObserver"; }
 };
 
+// write into log
 class LogAlertObserver : public AlertObserver {
 public:
     std::string observer_name() const override { return "LogObserver"; }
+};
+
+// Statistics alerts
+class StatsAlertObserver : public AlertObserver {
+public:
+    std::string observer_name() const override { return "StatsObserver"; }
 };
 
 #endif

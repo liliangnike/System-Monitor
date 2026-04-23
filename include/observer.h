@@ -1,6 +1,8 @@
 #ifndef __OBSERVER_HEADER_FILE__
 #define __OBSERVER_HEADER_FILE__
 
+#include <string>
+#include <vector>
 #include <memory>
 #include "process_info.h"
 
@@ -24,7 +26,7 @@ class AlertObserver {
 public:
     // Must be virtual destructor, if the parent class was used as unified interface
     virtual ~AlertObserver() = default;
-    virtual std::string observer_name() const;
+    virtual std::string observer_name() const = 0;
 
 };
 
@@ -42,7 +44,7 @@ public:
 
 private:
     // Define weak_ptr type.
-    std::vector<std::weakr_ptr<AlertObserver>> observers_;
+    std::vector<std::weak_ptr<AlertObserver>> observers_;
 };
 
 // print to console

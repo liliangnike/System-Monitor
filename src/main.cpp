@@ -19,7 +19,7 @@ static void demo_stl(const std::vector<process_info_t>& procs)
     // syntax: [capture list](parameter list) -> return value type { function body }
     //
     // C++ compiler consider lambda as one class
-    // capture list: data member
+    // capture list: data member (normally they are external variables required in the lambda function)
     // parameter list: member function parameter list
     // return type: return data type, optional (think about Python)
     // function body: implementation

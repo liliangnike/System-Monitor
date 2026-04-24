@@ -4,7 +4,19 @@
 
 void AlertSubject::subscribe(std::shared_ptr<AlertObserver> observer)
 {
+    cleanup_expired_observers();
+    observers_.emplace_back(observer);
+}
 
+void AlertSubject::unsubscribe(const std::string& name)
+{
+    auto it = std::remove_if(observers_.begin(), observers_.end(),
+                            [&name](const std::weak_ptr<AlertObserver>& obs) {
+                                auto sp = obs.lock();
+                                return !sp || sp->observer_name() == name;
+                            });
+
+    observers_.erase(it, observers_.end());
 }
 
 void AlertSubject::cleanup_expired_observers()

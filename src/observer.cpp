@@ -19,6 +19,16 @@ void AlertSubject::unsubscribe(const std::string& name)
     observers_.erase(it, observers_.end());
 }
 
+void AlertSubject::notify(const AlertEvent& event)
+{
+    cleanup_expired_observers();
+    for(auto& wp : observers_) {
+        if (auto sp = wp.lock()) { // lock(): weak_ptr -> shared_ptr
+            sp->on_alert(event);
+        }
+    }
+}
+
 void AlertSubject::cleanup_expired_observers()
 {
     // remove_if defined in the library algorithm

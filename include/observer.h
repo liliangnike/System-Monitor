@@ -27,6 +27,7 @@ public:
     // Must be virtual destructor, if the parent class was used as unified interface
     virtual ~AlertObserver() = default;
     virtual std::string observer_name() const = 0;
+    virtual void on_alert(const AlertEvent& event) = 0;
 
 };
 
@@ -50,18 +51,21 @@ private:
 // print to console
 class ConsoleAlertObserver : public AlertObserver {
 public:
+    void on_alert(const AlertEvent& event) override;
     std::string observer_name() const override { return "ConsoleObserver"; }
 };
 
 // write into log
 class LogAlertObserver : public AlertObserver {
 public:
+    void on_alert(const AlertEvent& event) override;
     std::string observer_name() const override { return "LogObserver"; }
 };
 
 // Statistics alerts
 class StatsAlertObserver : public AlertObserver {
 public:
+    void on_alert(const AlertEvent& event) override;
     std::string observer_name() const override { return "StatsObserver"; }
 };
 

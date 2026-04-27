@@ -5,8 +5,9 @@
 #include <cstdint>
 
 #include "process_info.h"
+#include "observer.h"
 
-class MonitorBase {
+class MonitorBase : public AlertSubject {
 public:
     MonitorBase() = default;
     virtual ~MonitorBase() = default;   // Hey Compiler. Please help to generate the default destructor functon.
@@ -20,6 +21,11 @@ public:
     virtual std::string report(const process_info_t& proc) const = 0;
 
     void run(process_info_t& proc);
+
+    // history size belongs to class instead of objects
+    // constexpr means this variable should be initialized in class. So it can be size of array defined in the class
+    // 'static const' does not allow users to assign value in class definition. User needs to give value in .cpp file
+    static constexpr std::size_t HISTORY_SIZE = 20;
 };
 
 // final means that the inheritance 'stops' here, the child class is prohibitted to derive (impossible to have its child class)

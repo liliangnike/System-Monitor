@@ -5,6 +5,7 @@
 #include "logger.h"
 #include "monitor.h"
 #include "process_info.h"
+#include "observer.h"
 
 static void alert_callback(const process_info_t* p, const char* msg)
 {
@@ -68,12 +69,29 @@ int main(void)
 {
     std::srand(42);
 
-    // Logger singleton instance
+    /* ----------------------------------------------------------
+     * 1. Initial logger instance - Singleton
+     * ----------------------------------------------------------*/
+
     Logger* log = Logger::instance();
     log->set_loglevel(LogLevel::DEBUG);
     log->set_log_file("system_monitor.log");
     
     log->info("=== System Monitor Started ===");
+
+    /* ----------------------------------------------------------
+     * 2. Create observers (shared_ptr)
+     * ----------------------------------------------------------*/
+    auto console_obs = std::make_shared<ConsoleAlertObserver>();
+    auto log_obs     = std::make_shared<LogAlertObserver>();
+    auto statis_obs  = std::make_shared<StatsAlertObserver>();
+
+    /* ----------------------------------------------------------
+     * 3. Create monitors by factory
+     * ----------------------------------------------------------*/
+    auto cpu_mon = MonitorFactory::create(MonitorFactory::Type::CPU);
+    auto mem_mon = MonitorFactory::create(MonitorFactory::Type::MEMORY);
+    auto composite_mon = MonitorFactory::create("composite");
 
     proc_set_alert_cb(alert_callback);
 
@@ -90,9 +108,9 @@ int main(void)
 
     // Factory function to create monitors
     std::vector<std::unique_ptr<MonitorBase>> monitors;
-    monitors.push_back(MonitorFactory::create(MonitorFactory::Type::CPU));
-    monitors.push_back(MonitorFactory::create(MonitorFactory::Type::MEMORY));
-    monitors.push_back(MonitorFactory::create("composite"));
+    monitors.push_back(cpu_mon);
+    monitors.push_back(mem_mon);
+    monitors.push_back(composite_mon);
 
     log->info("Created " + std::to_string(monitors.size()) + " monitors via factory.");
 

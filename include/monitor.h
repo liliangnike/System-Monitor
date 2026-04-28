@@ -6,6 +6,7 @@
 
 #include "process_info.h"
 #include "observer.h"
+#include "ring_buffer.h"
 
 class MonitorBase : public AlertSubject {
 public:
@@ -26,6 +27,11 @@ public:
     // constexpr means this variable should be initialized in class. So it can be size of array defined in the class
     // 'static const' does not allow users to assign value in class definition. User needs to give value in .cpp file
     static constexpr std::size_t HISTORY_SIZE = 20;
+    RingBuffer<process_info_t, HISTORY_SIZE>& get_history() { return history_; }
+    const RingBuffer<process_info_t, HISTORY_SIZE>& get_history() const { return history_; }
+
+private:
+    RingBuffer<process_info_t, HISTORY_SIZE> history_;
 };
 
 // final means that the inheritance 'stops' here, the child class is prohibitted to derive (impossible to have its child class)

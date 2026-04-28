@@ -93,6 +93,19 @@ int main(void)
     auto mem_mon = MonitorFactory::create(MonitorFactory::Type::MEMORY);
     auto composite_mon = MonitorFactory::create("composite");
 
+    /* ----------------------------------------------------------
+     * 4. Subscribe observers to Subject (Monitor)
+     *    observers are saved as weak_ptr type
+     * ----------------------------------------------------------*/
+
+    cpu_mon->subscribe(console_obs);
+    cpu_mon->subscribe(log_obs);
+    cpu_mon->subscribe(statis_obs);
+
+    mem_mon->subscribe(console_obs);
+    mem_mon->subscribe(log_obs);
+    mem_mon->subscribe(statis_obs);
+
     proc_set_alert_cb(alert_callback);
 
     const char* proc_names[] = {
@@ -108,9 +121,12 @@ int main(void)
 
     // Factory function to create monitors
     std::vector<std::unique_ptr<MonitorBase>> monitors;
-    monitors.push_back(cpu_mon);
-    monitors.push_back(mem_mon);
-    monitors.push_back(composite_mon);
+    // cpu_mon, mem_mon are unique_ptr and do not allow to copy
+    // move function can cast a left value to a right value
+    // After the move, cpu_mon, mem_mon are changed into nullptr, and could not continue using any more.
+    monitors.push_back(std::move(cpu_mon));
+    monitors.push_back(std::move(mem_mon));
+    monitors.push_back(std::move(composite_mon));
 
     log->info("Created " + std::to_string(monitors.size()) + " monitors via factory.");
 

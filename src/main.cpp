@@ -106,8 +106,14 @@ int main(void)
     mem_mon->subscribe(log_obs);
     mem_mon->subscribe(statis_obs);
 
+    /* ----------------------------------------------------------
+     * 5. Register alert callback function
+     * ----------------------------------------------------------*/
     proc_set_alert_cb(alert_callback);
 
+    /* ----------------------------------------------------------
+     * 6. Simulate processes list
+     * ----------------------------------------------------------*/
     const char* proc_names[] = {
         "nginx", "postgres", "redis", "python3", "gcc"
     };

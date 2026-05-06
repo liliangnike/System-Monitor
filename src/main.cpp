@@ -125,6 +125,10 @@ int main(void)
         init_proc(&procs[i], 1000 + i * 100, proc_names[i]);
     }
 
+    /* ----------------------------------------------------------
+     * 7. Demo life cycle of weak_ptr
+     * ----------------------------------------------------------*/
+
     // Factory function to create monitors
     std::vector<std::unique_ptr<MonitorBase>> monitors;
     // cpu_mon, mem_mon are unique_ptr and do not allow to copy

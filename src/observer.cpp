@@ -30,6 +30,11 @@ void AlertSubject::notify(const AlertEvent& event)
     }
 }
 
+std::size_t AlertSubject::observer_size() const
+{
+    return observers_.size();
+}
+
 void AlertSubject::cleanup_expired_observers()
 {
     // remove_if defined in the library algorithm

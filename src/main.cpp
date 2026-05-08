@@ -126,8 +126,15 @@ int main(void)
     }
 
     /* ----------------------------------------------------------
-     * 7. Demo life cycle of weak_ptr
+     * 7. Demo life time of weak_ptr
      * ----------------------------------------------------------*/
+    log->info("=== Demo: Observer life time with weak_prt ===");
+    {
+        auto tmp_obs = std::make_shared<ConsoleAlertObserver>();
+        cpu_mon->subscribe(tmp_obs);
+        log->info("Temporary observer subscribed, count = " + std::to_string(cpu_mon->observer_size()));
+    }
+    log->info("=== Temporary observer shared pointer destroyed, next notify will cleanup automatically.===");
 
     // Factory function to create monitors
     std::vector<std::unique_ptr<MonitorBase>> monitors;
@@ -137,6 +144,8 @@ int main(void)
     monitors.push_back(std::move(cpu_mon));
     monitors.push_back(std::move(mem_mon));
     monitors.push_back(std::move(composite_mon));
+ 
+    // If continue to use the pointer cpu_mon, mem_mon, then the program will be crashed
 
     log->info("Created " + std::to_string(monitors.size()) + " monitors via factory.");
 

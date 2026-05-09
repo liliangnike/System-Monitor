@@ -136,6 +136,9 @@ int main(void)
     }
     log->info("=== Temporary observer shared pointer destroyed, next notify will cleanup automatically.===");
 
+    /* ----------------------------------------------------------
+     * 8. Main loop for monitoring
+     * ----------------------------------------------------------*/
     // Factory function to create monitors
     std::vector<std::unique_ptr<MonitorBase>> monitors;
     // cpu_mon, mem_mon are unique_ptr and do not allow to copy

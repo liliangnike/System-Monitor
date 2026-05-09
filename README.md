@@ -10,3 +10,4 @@ Demo project for C/C++ knowledge practice:
 - C++ Polymorphism
 - virtual functions (parent class destructor, pure virtual functions)
 - smart pointers (unique_ptr, shared_ptr and weak_ptr)
+- design patterns, like Singleton, Factory Pattern, Observer

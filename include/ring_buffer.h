@@ -20,10 +20,9 @@ public:
 
     void push(const T& value)
     {
-        bool full = (count_ == N);
         buf_[tail_] = value;
         tail_ = (tail_ + 1) % N;    // Circular buffer, when tail_ is N -1, it will become 0 (back to the beginning)
-        if (full) {
+        if (full()) {
             head_ = (head_ + 1) % N;
         }
         else {
@@ -36,10 +35,9 @@ public:
     // If you want to merge the 2 push functions into one, the function could be 'void push(T value)' that can accept both left and right values
     void push(T&& value)
     {
-        bool full = (count_ == N);
         buf_[tail_] = std::move(value);
         tail_ = (tail_ + 1) % N;    // Circular buffer, when tail_ is N -1, it will become 0 (back to the beginning)
-        if (full) {
+        if (full()) {
             head_ = (head_ + 1) % N;
         }
         else {
@@ -61,6 +59,16 @@ public:
         return buf_[(head_ + idx) % N];
     }
 
+    const T& latest() const
+    {
+        if (count_ == 0) throw std::out_of_range("RingBuffer: empty");
+        return (*this)[count_ - 1];
+    }
+
+    constexpr std::size_t capacity() const { return N; }
+    std::size_t size() const { return count_; }
+    bool empty() const { return count_ == 0; }
+    bool full() const { return count_ == N; }
 private:
     // C++ array is similar to C array, it is static and allocated in stack
     // vector is dynamic and allows to insert/delete element. Allocated in heap.

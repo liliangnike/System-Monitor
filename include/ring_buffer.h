@@ -31,6 +31,36 @@ public:
         }
     }
 
+    // std::move syntax version to support right value
+    // The function does not accept left value
+    // If you want to merge the 2 push functions into one, the function could be 'void push(T value)' that can accept both left and right values
+    void push(T&& value)
+    {
+        bool full = (count_ == N);
+        buf_[tail_] = std::move(value);
+        tail_ = (tail_ + 1) % N;    // Circular buffer, when tail_ is N -1, it will become 0 (back to the beginning)
+        if (full) {
+            head_ = (head_ + 1) % N;
+        }
+        else {
+            ++count_;
+        }
+    }
+
+    // element access operator implementation
+    // return the element reference
+    T& operator[](std::size_t idx)
+    {
+        if (idx > count_) throw std::out_of_range("RingBuffer: index out of range");
+        return buf_[(head_ + idx) % N];
+    }
+
+    const T& operator[](std::size_t idx) const
+    {
+        if (idx > count_) throw std::out_of_range("RingBuffer: index out of range");
+        return buf_[(head_ + idx) % N];
+    }
+
 private:
     // C++ array is similar to C array, it is static and allocated in stack
     // vector is dynamic and allows to insert/delete element. Allocated in heap.

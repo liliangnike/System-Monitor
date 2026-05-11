@@ -2,6 +2,7 @@
 #define __RING_BUFFER_HEADER__
 
 #include <array>
+#include <functional>
 
 // C++ generic programming
 
@@ -62,6 +63,9 @@ public:
     const T& latest() const
     {
         if (count_ == 0) throw std::out_of_range("RingBuffer: empty");
+
+        // Can we use buf_ data? Yes, but it should be 'return buf_[(head_ + count_ - 1) % N];'
+        // Operator [] was already implemented, so use this pointer to get current object. This way is better.
         return (*this)[count_ - 1];
     }
 
@@ -69,6 +73,17 @@ public:
     std::size_t size() const { return count_; }
     bool empty() const { return count_ == 0; }
     bool full() const { return count_ == N; }
+
+    // In C++, there are function, Lambda expression, class functions, .etc
+    // std::function is used to save function objects or support pass function as parameter....
+    // std::function <return_type(parameter types)>
+    void for_each(const std::function<void(const T&)>& fn) const
+    {
+        for(std::size_t i = 0; i < count_; i++) {
+            fn((*this)[i]);
+        }
+    }
+
 private:
     // C++ array is similar to C array, it is static and allocated in stack
     // vector is dynamic and allows to insert/delete element. Allocated in heap.

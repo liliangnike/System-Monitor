@@ -174,6 +174,17 @@ int main(void)
         check_proc_thresholds(&proc, 60.0, 300ULL * 1024 * 1024);
     }
 
+    /* ----------------------------------------------------------
+     * 9. Demo for RingBuffer access history
+     * ----------------------------------------------------------*/
+    log->info("=== Demo RingBuffer history ===");
+    auto& cpu_history = monitors[0]->get_history();
+    log->info("CPU monitor history size: " + std::to_string(cpu_history.size()) + "/" + std::to_string(cpu_history.capacity()));
+    if (!cpu_history.empty()) {
+        const auto& latest = cpu_history.latest();
+        log->info("Latest sampled: pid = " + std::to_string(latest.pid) + " cpu = " + std::to_string((int)(latest.cpu_usage)) + "%" );
+    }
+
     log->info("=== Show Process Information ===");
     for (const auto& proc:procs) {
         // C function

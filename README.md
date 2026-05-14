@@ -1,4 +1,6 @@
-Demo project for C/C++ knowledge practice:
+This is private project for C/C++ practice and open source learning. Just for reference.
+No any commercial confidentials and company source code.
+
 - C enum and C++ enum
 - extern "C"
 - static variables and functions

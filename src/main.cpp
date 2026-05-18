@@ -1,11 +1,13 @@
 #include <iostream>
 #include <cstdlib>
 #include <vector>
+#include <string>
 
 #include "logger.h"
 #include "monitor.h"
 #include "process_info.h"
 #include "observer.h"
+#include "snapshot_writer.h"
 
 static void alert_callback(const process_info_t* p, const char* msg)
 {
@@ -183,6 +185,21 @@ int main(void)
     if (!cpu_history.empty()) {
         const auto& latest = cpu_history.latest();
         log->info("Latest sampled: pid = " + std::to_string(latest.pid) + " cpu = " + std::to_string((int)(latest.cpu_usage)) + "%" );
+    }
+
+    /* ----------------------------------------------------------
+     * 10. Flush history data into csv file
+     * ----------------------------------------------------------*/
+    log->info("=== Flush history to CSV ===");
+    {
+        std::string csv_filename("snapshot.csv");
+        SnapshotWriter writer(csv_filename);
+        if (writer.is_open()) {
+            for (auto& monitor:monitors) {
+                writer.flush_history(monitor->get_history());
+            }
+            log->info("Wrote" + std::to_string(writer.written_rows()) + "rows to " + csv_filename);
+        }
     }
 
     log->info("=== Show Process Information ===");

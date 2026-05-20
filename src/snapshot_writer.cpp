@@ -1,3 +1,4 @@
+#include <ctime>
 #include "snapshot_writer.h"
 #include "logger.h"
 
@@ -37,6 +38,9 @@ void SnapshotWriter::write(const process_info_t& proc)
 {
     if (!file_.is_open()) return;
 
-
+    // format timestamp
+    char ts[32];
+    std::time_t now_in_seconds = std::time(nullptr);
+    std::strftime(ts, sizeof(ts), "%Y-%m-%d %H:%M:%S", std::localtime(&now_in_seconds)); //Both parameter and return types of std::localtime are pointer
 }
 

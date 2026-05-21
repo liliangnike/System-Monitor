@@ -4,6 +4,7 @@
 #include <string>
 #include <fstream>
 
+#include "process_info.h"
 #include "ring_buffer.h"
 
 class SnapshotWriter

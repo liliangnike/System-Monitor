@@ -198,7 +198,7 @@ int main(void)
             for (auto& monitor:monitors) {
                 writer.flush_history(monitor->get_history());
             }
-            log->info("Wrote" + std::to_string(writer.written_rows()) + "rows to " + csv_filename);
+            log->info("Wrote " + std::to_string(writer.written_rows()) + " rows to " + csv_filename);
         }
     }
 

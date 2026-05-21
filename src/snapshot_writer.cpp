@@ -1,4 +1,6 @@
 #include <ctime>
+#include <iomanip>
+
 #include "snapshot_writer.h"
 #include "logger.h"
 
@@ -42,5 +44,18 @@ void SnapshotWriter::write(const process_info_t& proc)
     char ts[32];
     std::time_t now_in_seconds = std::time(nullptr);
     std::strftime(ts, sizeof(ts), "%Y-%m-%d %H:%M:%S", std::localtime(&now_in_seconds)); //Both parameter and return types of std::localtime are pointer
+
+    const char* states[] = {"RUNNING", "SLEEPING", "STOPPED", "ZOMBIE"};
+    file_ << ts
+          << ", " << proc.pid
+          << ", " << proc.name
+          << ", " << states[proc.state]
+          << ", " << std::fixed << std::setprecision(1) << proc.cpu_usage
+          << ", " << (proc.mem_bytes >> 20)  // bytes -> Mb
+          << "\n";
+
+    ++row_;
+    // flush every 10 lines
+    if (row_ % 10 == 0) file_.flush();
 }
 

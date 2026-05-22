@@ -16,10 +16,10 @@ TARGET	  := system_monitor
 # -Wall -Wextra -> enable all compilation warning
 #  -std -> language standards
 #  -g: generate gnu debug inforation
-#  -O2: optimization level
+#  -O2: optimization level, if debugging with gdb, O2 should be changed into O0?
 #  -I: local project directory where to find the header files
-CFLAGS    := -Wall -Wextra -std=c11 -g -O2 -I $(INC_DIR)
-CXXFLAGS  := -Wall -Wextra -std=c++17 -g -O2 -I $(INC_DIR)
+CFLAGS    := -Wall -Wextra -std=c11 -g -O0 -I $(INC_DIR)
+CXXFLAGS  := -Wall -Wextra -std=c++17 -g -O0 -I $(INC_DIR)
 # thread programming
 LDFLAGS   := -lpthread
 

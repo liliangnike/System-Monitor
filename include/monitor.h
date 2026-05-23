@@ -30,7 +30,9 @@ public:
     RingBuffer<process_info_t, HISTORY_SIZE>& get_history() { return history_; }
     const RingBuffer<process_info_t, HISTORY_SIZE>& get_history() const { return history_; }
 
-private:
+// protected: both parent and child class can use
+// private: only parent class object can use
+protected:
     RingBuffer<process_info_t, HISTORY_SIZE> history_;
 };
 
@@ -44,6 +46,7 @@ public:
     std::string report(const process_info_t& proc) const override;
 private:
     double warn_threshold_;
+    bool in_alert_ = false;
 };
 
 class MemoryMonitor final : public MonitorBase {
@@ -55,6 +58,7 @@ public:
     std::string report(const process_info_t& proc) const override;
 private:
     uint64_t warn_bytes_;
+    bool in_alert_ = false;
 };
 
 class CompositeMonitor final : public MonitorBase {

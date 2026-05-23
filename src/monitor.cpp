@@ -23,6 +23,33 @@ void CpuMonitor::collect(process_info_t& proc)
     if (proc.cpu_usage > warn_threshold_) {
         Logger::instance()->warn("High CPU: " + name() + ", pid = " + std::to_string(proc.pid));
     }
+
+    history_.push(proc);
+
+    if (proc.cpu_usage > warn_threshold_) {
+        if ( !in_alert_ ) {
+            in_alert_ = true;
+            AlertEvent ev;
+            ev.alert_type = AlertType::CPU_HIGH;
+            ev.proc = proc;
+            ev.value = proc.cpu_usage;
+            ev.threshold = warn_threshold_;
+            ev.message = std::string(proc.name) + " CPU " + std::to_string((int)proc.cpu_usage) + "% > " + std::to_string((int)warn_threshold_) + "%";
+            notify(ev);
+        }
+    }
+    else {
+        if (in_alert_) {
+            in_alert_ = false;
+            AlertEvent ev;
+            ev.alert_type = AlertType::CPU_NORMAL;
+            ev.proc = proc;
+            ev.value = proc.cpu_usage;
+            ev.threshold = warn_threshold_;
+            ev.message = std::string(proc.name) + " CPU recovered";
+            notify(ev);
+        }
+    }
 }
 
 std::string CpuMonitor::report(const process_info_t& proc) const

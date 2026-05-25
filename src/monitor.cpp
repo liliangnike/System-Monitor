@@ -73,8 +73,35 @@ std::string MemoryMonitor::name() const{
 void MemoryMonitor::collect(process_info_t& proc)
 {
     proc.mem_bytes = sample_proc_mem(proc.pid);
+
+    history_.push(proc);
+
     if (proc.mem_bytes > warn_bytes_) {
-        Logger::instance()->warn("High MEM: " + name() + ", pid = " + std::to_string(proc.pid));
+        if (!in_alert_) {
+            in_alert_ = true;
+            AlertEvent ev;
+            ev.alert_type = AlertType::MEM_HIGH;
+            ev.proc = proc;
+            // static_cast is executed during compile-time, dynamic_cast is during run-time
+            // Child class -> parent class, static_cast is perfect and saft
+            // Parent class -> child class, dynamic_cast should be used
+            ev.value = static_cast<double>(proc.mem_bytes >> 20);
+            ev.threshold = static_cast<double>(warn_bytes_ >> 20);
+            ev.message = std::string(proc.name) + " MEM " + std::to_string((int)proc.mem_bytes) + "MB > " + std::to_string((int)warn_bytes_) + "MB";
+            notify(ev);
+        }
+    }
+    else {
+        if (in_alert_) {
+            in_alert_ = false;
+            AlertEvent ev;
+            ev.alert_type = AlertType::MEM_NORMAL;
+            ev.proc = proc;
+            ev.value = proc.mem_bytes;
+            ev.threshold = warn_bytes_;
+            ev.message = std::string(proc.name) + " MEM recovered";
+            notify(ev);
+        }
     }
 }
 

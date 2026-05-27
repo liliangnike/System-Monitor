@@ -67,6 +67,10 @@ class StatsAlertObserver : public AlertObserver {
 public:
     void on_alert(const AlertEvent& event) override;
     std::string observer_name() const override { return "StatsObserver"; }
+
+    int get_cpu_alert_count() const { return cpu_count_; }
+    int get_mem_alert_count() const { return mem_count_; }
+
 private:
     int cpu_count_ = 0;
     int mem_count_ = 0;

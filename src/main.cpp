@@ -202,7 +202,13 @@ int main(void)
         }
     }
 
-    log->info("=== Show Process Information ===");
+    /* ----------------------------------------------------------
+     * 11. Observer Statistics
+     * ----------------------------------------------------------*/
+    log->info("=== Alerts statistics ===");
+    log->info("CPU alerts: " + std::to_string(statis_obs->get_cpu_alert_count()));
+    log->info("MEM alerts: " + std::to_string(statis_obs->get_mem_alert_count()));
+
     for (const auto& proc:procs) {
         // C function
         show_proc(&proc);

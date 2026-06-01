@@ -6,6 +6,8 @@
 
 // C++ generic programming
 
+// template not only accepts type, but also a number
+// Both T and N are confirmed during compilation.
 template <typename T, std::size_t N>
 class RingBuffer {
     // static_assert is very important in generic programming

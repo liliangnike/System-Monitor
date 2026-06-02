@@ -19,6 +19,7 @@ class Logger {
 public:
     static Logger *instance();
 
+    /* Singleton == unique, means cannot copy, move, assign. Below 4 function deletion makes singleton to be safer.*/
     // & - Left value reference
     //
     // Logger should not be cloned
@@ -27,6 +28,9 @@ public:
     Logger& operator=(const Logger&)   = delete;
 
     // && - Right value reference
+    // std::move is disallowed, for example,
+    // Logger a = std::move(Logger::instance());      // Singleton content will be moved away
+    // Good programming practice to write both function explicitly
     Logger(Logger&&)                   = delete;
     Logger&& operator=(Logger&&)       = delete;
 

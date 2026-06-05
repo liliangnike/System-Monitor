@@ -8,6 +8,8 @@
 class AlertQueue 
 {
 public:
+    // Producer
+    void push(const AlertEvent& event);
 private:
     // 1. FIFO
     // 2. Check empty() before using pop()

@@ -8,5 +8,6 @@ void AlertQueue::push(const AlertEvent& event)
         queue_.push(event);
     }
     // RAII, lock destructor (mutex_.unlock() is called automatically)
-    
+
+    cv_.notify_one();   // Call thread "Wake up, please. Works are coming."
 }

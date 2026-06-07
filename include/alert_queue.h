@@ -3,6 +3,7 @@
 
 #include <queue>
 #include <mutex>
+#include <condition_variable>
 #include "observer.h"
 
 class AlertQueue 
@@ -17,6 +18,13 @@ private:
     // 4. Try to use emplace(). push() copies objects.
     std::queue<AlertEvent> queue_;
     mutable std::mutex mutex_;      // std::queue is not thread-safe
+
+    // Thread - Room
+    // std::mutex - Door of the room
+    // std::condition_variable 
+    // 1. Alarm Clock in the room - when some conditions are not met, set a timer and let thread to sleep. Release the lock (open the door)
+    // 2. Two-way radio in the room - Whem the conditions are met, the thread will be invoked immediately and locked (close the door)
+    std::condition_variable cv_;
 };
 
 #endif

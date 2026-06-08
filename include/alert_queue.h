@@ -4,6 +4,7 @@
 #include <queue>
 #include <mutex>
 #include <condition_variable>
+#include <optional>
 #include "observer.h"
 
 class AlertQueue 
@@ -11,6 +12,10 @@ class AlertQueue
 public:
     // Producer
     void push(const AlertEvent& event);
+
+    // std::optional is introduced in C++17, means possibly returns valid value/data or returns nothing (std::nullopt)
+    // After C++17/20, if there is case that "value may exist or not", use std::optional
+    std::optional<AlertEvent> pop();
 private:
     // 1. FIFO
     // 2. Check empty() before using pop()

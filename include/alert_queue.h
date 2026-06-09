@@ -30,6 +30,12 @@ private:
     // 1. Alarm Clock in the room - when some conditions are not met, set a timer and let thread to sleep. Release the lock (open the door)
     // 2. Two-way radio in the room - Whem the conditions are met, the thread will be invoked immediately and locked (close the door)
     std::condition_variable cv_;
+
+    // List initialization, avoid implicit narrowing conversion
+    // e.g.
+    // int num1 = 3.14, num1 is converted to 3
+    // int num2{3.14}, compilation errors
+    bool shutdown_{false};
 };
 
 #endif

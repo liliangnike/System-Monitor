@@ -22,11 +22,33 @@ std::optional<AlertEvent> AlertQueue::pop()
     std::unique_lock<std::mutex> lk(mutex_);
 
     // The lambda function is to avoid Spurious Wakeup - Even though producer did not call notify_one(), OS might invoke the consumer thread
-    cv_.wait(lk, [this]() { return !queue_.empty(); });
+    cv_.wait(lk, [this]() { return !queue_.empty() || shudown_; });
 
     if (queue_.empty()) return std::nullopt;
     AlertEvent event = queue_.front();
     queue_.pop();
 
     return event;
+}
+
+void AlertQueue::shutdown()
+{
+    {
+        std::lock_guard<std::mutex> lock(mutex_);
+        shutdown_ = true;
+    }
+
+    cv_.notify_all();
+}
+
+bool AlertQueue::empty() const
+{
+    std::lock_guard<std::mutex> lock(mutex_);
+    return queue_.empty();
+}
+
+std::size_t AlertQueue::size() const
+{
+    std::lock_guard<std::mutex> lock(mutex_);
+    return queue_.size();
 }

@@ -16,6 +16,10 @@ public:
     // std::optional is introduced in C++17, means possibly returns valid value/data or returns nothing (std::nullopt)
     // After C++17/20, if there is case that "value may exist or not", use std::optional
     std::optional<AlertEvent> pop();
+
+    void shutdown();
+    bool empty() const;
+    std::size_t size() const;
 private:
     // 1. FIFO
     // 2. Check empty() before using pop()

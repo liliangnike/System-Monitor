@@ -2,12 +2,24 @@
 #include <cstdlib>
 #include <vector>
 #include <string>
+#include <atomic>
 
 #include "logger.h"
 #include "monitor.h"
 #include "process_info.h"
 #include "observer.h"
 #include "snapshot_writer.h"
+
+// CPU hardware layer instruction (x86:LOCK)
+// If one thread is executing atomic operations, it will not be interrupted
+// Example,
+// 1. int count = 0; count++; : read count -> +1 -> write value to memory. If the thread is switched into another one, the value will be incorrect.
+// 2. std::atomic<int> count{0}; count++; : CPU merges all steps into "one step", no any interruptions during threads "data race"
+//
+// For multiple threads,
+// - flags, state, counters, .etc: std::atomic should be used, much faster than mutex
+// - complex code logic: std::mutex should be used
+static std::atomic<uint64_t> g_sample_count{0};
 
 static void alert_callback(const process_info_t* p, const char* msg)
 {

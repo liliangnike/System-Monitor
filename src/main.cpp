@@ -9,6 +9,7 @@
 #include "process_info.h"
 #include "observer.h"
 #include "snapshot_writer.h"
+#include "alert_queue.h"
 
 // CPU hardware layer instruction (x86:LOCK)
 // If one thread is executing atomic operations, it will not be interrupted
@@ -20,6 +21,27 @@
 // - flags, state, counters, .etc: std::atomic should be used, much faster than mutex
 // - complex code logic: std::mutex should be used
 static std::atomic<uint64_t> g_sample_count{0};
+
+class QueueAlertObserver : AlertObserver
+{
+public:
+    explicit QueueAlertObserver(AlertQueue& q) : queue_(q) {}
+    void on_alert(const AlertEvent& event) override
+    {
+        queue_.push(event);
+        // std::atomic add function
+        // fetch -> then add
+        // return the old value before adding
+        // std::memory_order_relaxed: only atomic safety, do not care about other code execution order
+        // memory order (from loose to strict): relaxed < acquire/release < seq_cst
+        g_sample_count.fetch_add(1, std::memory_order_relaxed);
+    }
+
+    std::string observer_name() const override { return "QueueObserver"; }
+
+private:
+    AlertQueue& queue_;
+};
 
 static void alert_callback(const process_info_t* p, const char* msg)
 {

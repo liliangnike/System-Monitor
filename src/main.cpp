@@ -14,7 +14,7 @@
 // CPU hardware layer instruction (x86:LOCK)
 // If one thread is executing atomic operations, it will not be interrupted
 // Example,
-// 1. int count = 0; count++; : read count -> +1 -> write value to memory. If the thread is switched into another one, the value will be incorrect.
+// 1. int count = 0; count++; : read count -> +1 -> write value to memory. When another thread writes the value, the value might be incorrect.
 // 2. std::atomic<int> count{0}; count++; : CPU merges all steps into "one step", no any interruptions during threads "data race"
 //
 // For multiple threads,
@@ -115,12 +115,15 @@ int main(void)
     
     log->info("=== System Monitor Started ===");
 
+    AlertQueue alert_queue;
+
     /* ----------------------------------------------------------
      * 2. Create observers (shared_ptr)
      * ----------------------------------------------------------*/
     auto console_obs = std::make_shared<ConsoleAlertObserver>();
     auto log_obs     = std::make_shared<LogAlertObserver>();
     auto statis_obs  = std::make_shared<StatsAlertObserver>();
+    auto alert_obs   = std::make_shared<QueueAlertObserver>(alert_queue);
 
     /* ----------------------------------------------------------
      * 3. Create monitors by factory

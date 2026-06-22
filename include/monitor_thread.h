@@ -2,6 +2,7 @@
 #define __MONITOR_THREAD_HEADER_FILE__
 
 #include <thread>
+#include <atomic>
 #include "process_info.h"
 
 class MonitorThread 
@@ -24,6 +25,7 @@ public:
 private:
     process_info_t proc_;
 
+    std::atomic<bool> running_{false};
 };
 
 #endif

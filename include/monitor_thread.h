@@ -26,6 +26,7 @@ private:
     process_info_t proc_;
 
     std::atomic<bool> running_{false};
+    std::atomic<bool> stop_requested_{false};
 };
 
 #endif

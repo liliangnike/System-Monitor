@@ -21,3 +21,10 @@ void MonitorThread::start()
     if (running_.load()) return;
     stop_requested_.store(false);
 }
+
+void MonitorThread::stop()
+{
+    stop_requested_.store(false);
+
+    sleep_cv_.notify_all();
+}

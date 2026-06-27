@@ -27,6 +27,8 @@ private:
 
     std::atomic<bool> running_{false};
     std::atomic<bool> stop_requested_{false};
+
+    std::condition_variable sleep_cv_;
 };
 
 #endif

@@ -10,7 +10,7 @@ void AlertQueue::push(const AlertEvent& event)
     }
     // RAII, lock destructor (mutex_.unlock() is called automatically)
 
-    cv_.notify_one();   // Call thread "Wake up, please. Works are coming."
+    cv_.notify_one();   // Invoke one thread from consumer thread queue - "Wake up, please. Works are coming.". The invoked thread has highest priority.
 }
 
 // Consumer thread call pop

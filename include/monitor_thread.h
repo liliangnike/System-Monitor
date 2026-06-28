@@ -22,7 +22,13 @@ public:
     void start();
     void stop();
 
+    void join();
+
+    bool is_running() { return running_.load();}
+
 private:
+    void thread_loop();
+
     process_info_t proc_;
 
     std::atomic<bool> running_{false};

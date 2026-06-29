@@ -26,13 +26,17 @@ public:
 
     bool is_running() { return running_.load();}
 
+    const std::string& proc_name() const { return proc_name_; }
 private:
     void thread_loop();
 
     process_info_t proc_;
+    std::string proc_name_;
 
     std::atomic<bool> running_{false};
     std::atomic<bool> stop_requested_{false};
+
+    std::thread thread_;
 
     std::condition_variable sleep_cv_;
 };

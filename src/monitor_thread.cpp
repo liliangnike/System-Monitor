@@ -1,4 +1,5 @@
 #include "monitor_thread.h"
+#include "logger.h"
 
 MonitorThread::MonitorThread()
 {
@@ -25,6 +26,7 @@ void MonitorThread::start()
     // 1. Normal function, std::thread(function_name, parameters_lists)
     // 2. Class member function, std::thread(&class::function_name, this, parameters), 'this' is must
     thread_ = std::thread(&MonitorThread::thread_loop, this);
+    Logger::instance()->info("[Thread] Started for proc: " + proc_name_);
 }
 
 void MonitorThread::stop()
@@ -37,6 +39,13 @@ void MonitorThread::stop()
 
 void MonitorThread::join()
 {
+    if(thread_.joinable()) {
+        // thread join function
+        // 1. Main thread stops here and wait for sub-thread to finish
+        // 2. After sub-thread is finished, help to clear the resource that was not freed
+        // 3. Once join finishes, 100% sure that sub-thread has finished. Main thread can read data that saved by the sub-thread safety, no data race.
+        thread_.join();
+    }
 }
 
 void MonitorThread::thread_loop()

@@ -7,6 +7,8 @@ MonitorThread::MonitorThread()
 
 MonitorThread::~MonitorThread()
 {
+    stop();
+    join(); // wait for thread to finish
 }
 
 void MonitorThread::start()
@@ -39,6 +41,7 @@ void MonitorThread::stop()
 
 void MonitorThread::join()
 {
+    // check whether thread is joinable. Otherwise, there will be unexpected behaviors
     if(thread_.joinable()) {
         // thread join function
         // 1. Main thread stops here and wait for sub-thread to finish

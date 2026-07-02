@@ -1,7 +1,10 @@
 #include "monitor_thread.h"
 #include "logger.h"
 
-MonitorThread::MonitorThread()
+MonitorThread::MonitorThread(process_info_t proc,
+                 std::unique_ptr<MonitorBase> monitor,
+                 std::chrono::milliseconds interval)
+    : proc_(proc), monitor_(monitor), interval_(interval), proc_name_(proc.name)
 {
 }
 
@@ -53,4 +56,6 @@ void MonitorThread::join()
 
 void MonitorThread::thread_loop()
 {
+    running_.store(true);
+    Logger::instance()->debug("[Thread] Loop started: " + proc_name_);
 }

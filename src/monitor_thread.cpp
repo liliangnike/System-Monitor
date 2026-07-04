@@ -58,4 +58,15 @@ void MonitorThread::thread_loop()
 {
     running_.store(true);
     Logger::instance()->debug("[Thread] Loop started: " + proc_name_);
+
+    while(!stop_requested_.load()) {
+        try {
+            monitor_->run(proc_);
+        } catch(const std::exception& e) {
+            Logger::instance()->error("[Thread] " + proc_name_ + " monitor threw exceptions: " + e.what());
+        }
+    }
+
+    running_.store(false);
+    Logger::instance()->debug("[Thread] Loop ended: " + proc_name_);
 }

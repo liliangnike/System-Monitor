@@ -65,7 +65,15 @@ void MonitorThread::thread_loop()
         } catch(const std::exception& e) {
             Logger::instance()->error("[Thread] " + proc_name_ + " monitor threw exceptions: " + e.what());
         }
+    
+        // lock_guard does not support unlock during the whole lock life, use unique_lock here
+        std::unique_lock<std::mutex> lk(sleep_lock_);
+
+        // wait - wait all the time until notify()
+        // wait_for - wait for some time, will return when timeout or notify()
+        sleep_cv_.wait_for(lk, std::chrono::milliseconds(300), [this]{ return stop_requested_.load(); }); // wait for either at most 300ms or stop request is true
     }
+
 
     running_.store(false);
     Logger::instance()->debug("[Thread] Loop ended: " + proc_name_);

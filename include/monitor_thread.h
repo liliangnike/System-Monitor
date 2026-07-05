@@ -2,6 +2,7 @@
 #define __MONITOR_THREAD_HEADER_FILE__
 
 #include <thread>
+#include <mutex>
 #include <atomic>
 #include <chrono>
 #include "process_info.h"
@@ -44,6 +45,7 @@ private:
 
     std::thread thread_;
 
+    std::mutex sleep_lock_;
     std::condition_variable sleep_cv_;
 };
 

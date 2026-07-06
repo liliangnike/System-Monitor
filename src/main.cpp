@@ -113,7 +113,7 @@ int main(void)
     log->set_loglevel(LogLevel::DEBUG);
     log->set_log_file("system_monitor.log");
     
-    log->info("=== System Monitor Started ===");
+    log->info("=== System Monitor v3 Multi-threaded ===");
 
     AlertQueue alert_queue;
 
@@ -123,7 +123,7 @@ int main(void)
     auto console_obs = std::make_shared<ConsoleAlertObserver>();
     auto log_obs     = std::make_shared<LogAlertObserver>();
     auto statis_obs  = std::make_shared<StatsAlertObserver>();
-    auto alert_obs   = std::make_shared<QueueAlertObserver>(alert_queue);
+    auto queue_obs   = std::make_shared<QueueAlertObserver>(alert_queue);
 
     /* ----------------------------------------------------------
      * 3. Create monitors by factory
@@ -158,6 +158,12 @@ int main(void)
     };
     constexpr int PROC_COUNT = 5;   // const means the variable is not permitted to be changed during programming execution
                                     // constexpr means that the variable can be calculated out during compilation phase
+
+    // Why unique_ptr here (not thread objects)?
+    // MonitorThread contains std::thread that could not be copied
+    // When vector inserts new elements, existing elements need to be moved, and there are restrictions on mutex/condition_variable objects move
+    // unique_ptr just pointer move. It is safe.
+    std::vector<std::unique_ptr<MonitorThread>> threads;
 
     std::vector<process_info_t> procs(PROC_COUNT);
     for (int i = 0; i < PROC_COUNT; i++) {

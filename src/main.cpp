@@ -128,7 +128,6 @@ int main(void)
     /* ----------------------------------------------------------
      * 3. Create monitors by factory
      * ----------------------------------------------------------*/
-    auto cpu_mon = MonitorFactory::create(MonitorFactory::Type::CPU);
     auto mem_mon = MonitorFactory::create(MonitorFactory::Type::MEMORY);
     auto composite_mon = MonitorFactory::create("composite");
 
@@ -137,12 +136,8 @@ int main(void)
      *    observers are saved as weak_ptr type
      * ----------------------------------------------------------*/
 
-    cpu_mon->subscribe(console_obs);
-    cpu_mon->subscribe(log_obs);
-    cpu_mon->subscribe(statis_obs);
-
+    mem_mon->subscribe(queue_obs);
     mem_mon->subscribe(console_obs);
-    mem_mon->subscribe(log_obs);
     mem_mon->subscribe(statis_obs);
 
     /* ----------------------------------------------------------
@@ -165,9 +160,16 @@ int main(void)
     // unique_ptr just pointer move. It is safe.
     std::vector<std::unique_ptr<MonitorThread>> threads;
 
-    std::vector<process_info_t> procs(PROC_COUNT);
     for (int i = 0; i < PROC_COUNT; i++) {
-        init_proc(&procs[i], 1000 + i * 100, proc_names[i]);
+        process_info_t proc;
+        init_proc(&proc, 1000 + i * 100, proc_names[i]);
+
+        auto cpu_mon = MonitorFactory::create(MonitorFactory::Type::CPU);
+        cpu_mon->subscribe(queue_obs);
+        cpu_mon->subscribe(console_obs);
+        cpu_mon->subscribe(statis_obs);
+
+        threads.push_back(std::make_unique<MonitorThread>(proc, std::move(cpu_mon), std::chrono::milliseconds(300)));
     }
 
     /* ----------------------------------------------------------

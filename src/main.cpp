@@ -56,7 +56,7 @@ static void demo_stl(const std::vector<process_info_t>& procs)
     // syntax: [capture list](parameter list) -> return value type { function body }
     //
     // C++ compiler consider lambda as one class
-    // capture list: data member (normally they are external variables required in the lambda function)
+    // capture list: data member (normally they are external variables required in the lambda function) - That's why, lamda functions with data members could not be converted into C function pointer, because C function pointer is address, no space to save data members (capture list); if the capture list is empty, then lambda can be converted into C function pointer.
     // parameter list: member function parameter list
     // return type: return data type, optional (think about Python)
     // function body: implementation
@@ -171,6 +171,18 @@ int main(void)
 
         threads.push_back(std::make_unique<MonitorThread>(proc, std::move(cpu_mon), std::chrono::milliseconds(300)));
     }
+
+    // lambda function as thread function
+    // AlertQueue contains mutex and condition_variable. Both could not be copied. So use reference in capture list
+    std::thread csv_writer_thread( [&alert_queue]() {
+        log->info("[CSVWriter] Thread started");
+        SnapshotWriter writer("alerts.csv");
+        while(true) {
+            auto event = alert_queue.pop();
+            if (!event.has_value()) break;  //nullopt means 'shutdown', according to pop() implementation
+            writer.write(event->proc);
+        }
+    } );
 
     /* ----------------------------------------------------------
      * 7. Demo life time of weak_ptr

@@ -184,6 +184,9 @@ int main(void)
         }
     } );
 
+    log->info("Starting " + std::to_string(PROC_COUNT) + "monitor threads..." );
+    for (auto &t : threads) t->start();
+
     /* ----------------------------------------------------------
      * 7. Demo life time of weak_ptr
      * ----------------------------------------------------------*/

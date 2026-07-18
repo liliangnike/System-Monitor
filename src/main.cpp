@@ -174,6 +174,7 @@ int main(void)
 
     // lambda function as thread function
     // AlertQueue contains mutex and condition_variable. Both could not be copied. So use reference in capture list
+    // csv_writer_thread is sub-thread
     std::thread csv_writer_thread( [&alert_queue]() {
         log->info("[CSVWriter] Thread started");
         SnapshotWriter writer("alerts.csv");
@@ -183,9 +184,32 @@ int main(void)
             writer.write(event->proc);
         }
     } );
+  
+    // csv_writer_thread: pop() → wait() → 挂起
+    // MonitorThread[nginx]:   采样 → push() → notify → csv_writer 醒来写CSV → 再次挂起
+    // MonitorThread[postgres]: 采样 → push() → notify → csv_writer 醒来写CSV → 再次挂起
+    // 主线程 sleep 2秒后
+    // → alert_queue.shutdown()
+    // → shutdown_ = true，notify_all()
+    // → csv_writer 被唤醒
+    // → predicate 为 true（shutdown_ == true）
+    // → pop() 返回 nullopt
+    // → csv_writer_thread 退出循环，线程结束
 
     log->info("Starting " + std::to_string(PROC_COUNT) + "monitor threads..." );
     for (auto &t : threads) t->start();
+
+    log->info("Monitoring for 2 seconds...");
+    std::this_thread::sleep_fpr(std::chrono::seconds(2));
+
+    log->info("Stopping monitor threads...");
+    for(auto &t : threads) t->stop();
+
+    log->info("Shutting down alert queue...");
+    alert_queue.shutdown();
+
+    log->info("Waiting for CSV writer thread to finish...");
+    csv_writer_thread.join();
 
     /* ----------------------------------------------------------
      * 7. Demo life time of weak_ptr

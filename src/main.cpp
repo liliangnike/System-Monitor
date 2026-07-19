@@ -10,6 +10,7 @@
 #include "observer.h"
 #include "snapshot_writer.h"
 #include "alert_queue.h"
+#include "monitor_thread.h"
 
 // CPU hardware layer instruction (x86:LOCK)
 // If one thread is executing atomic operations, it will not be interrupted
@@ -200,7 +201,7 @@ int main(void)
     for (auto &t : threads) t->start();
 
     log->info("Monitoring for 2 seconds...");
-    std::this_thread::sleep_fpr(std::chrono::seconds(2));
+    std::this_thread::sleep_for(std::chrono::seconds(2));
 
     log->info("Stopping monitor threads...");
     for(auto &t : threads) t->stop();
@@ -212,93 +213,30 @@ int main(void)
     csv_writer_thread.join();
 
     /* ----------------------------------------------------------
-     * 7. Demo life time of weak_ptr
+     * Observer Statistics
      * ----------------------------------------------------------*/
-    log->info("=== Demo: Observer life time with weak_prt ===");
-    {
-        auto tmp_obs = std::make_shared<ConsoleAlertObserver>();
-        cpu_mon->subscribe(tmp_obs);
-        log->info("Temporary observer subscribed, count = " + std::to_string(cpu_mon->observer_size()));
-    }
-    log->info("=== Temporary observer shared pointer destroyed, next notify will cleanup automatically.===");
+    log->info("=== Results ===");
+    log->info("Total alerts: " + std::to_string(g_sample_count.load()));
+    log->info("CPU alerts: " + std::to_string(statis_obs->get_cpu_alert_count()));
+    log->info("MEM alerts: " + std::to_string(statis_obs->get_mem_alert_count()));
 
     /* ----------------------------------------------------------
-     * 8. Main loop for monitoring
-     * ----------------------------------------------------------*/
-    // Factory function to create monitors
-    std::vector<std::unique_ptr<MonitorBase>> monitors;
-    // cpu_mon, mem_mon are unique_ptr and do not allow to copy
-    // move function can cast a left value to a right value
-    // After the move, cpu_mon, mem_mon are changed into nullptr, and could not continue using any more.
-    monitors.push_back(std::move(cpu_mon));
-    monitors.push_back(std::move(mem_mon));
-    monitors.push_back(std::move(composite_mon));
- 
-    // If continue to use the pointer cpu_mon, mem_mon, then the program will be crashed
-
-    log->info("Created " + std::to_string(monitors.size()) + " monitors via factory.");
-
-    log->info("=== Monitoring round ===");
-    /*
-     * C++ auto keyword:
-     * 1. auto elem:vector -> value copy and does not modify value in the vector
-     * 2. auto& elem:vector -> no value copy and could modify value in the vector (reference)
-     * 3. const auto& elem:vector -> no value copy and could not modify value in the vector
-     */
-    for (auto& proc:procs) {
-        for (auto& monitor:monitors) {
-            try {
-                // Call base class virtual function
-                // During program run, associate child class function will be called
-                monitor->run(proc);
-            } catch (const std::exception& e) {
-                log->error("Monitor threw: " + std::string(e.what()));
-            }
-        }
-        
-        // C function
-        check_proc_thresholds(&proc, 60.0, 300ULL * 1024 * 1024);
-    }
-
-    /* ----------------------------------------------------------
-     * 9. Demo for RingBuffer access history
-     * ----------------------------------------------------------*/
-    log->info("=== Demo RingBuffer history ===");
-    auto& cpu_history = monitors[0]->get_history();
-    log->info("CPU monitor history size: " + std::to_string(cpu_history.size()) + "/" + std::to_string(cpu_history.capacity()));
-    if (!cpu_history.empty()) {
-        const auto& latest = cpu_history.latest();
-        log->info("Latest sampled: pid = " + std::to_string(latest.pid) + " cpu = " + std::to_string((int)(latest.cpu_usage)) + "%" );
-    }
-
-    /* ----------------------------------------------------------
-     * 10. Flush history data into csv file
+     * Flush history data into csv file
      * ----------------------------------------------------------*/
     log->info("=== Flush history to CSV ===");
     {
         std::string csv_filename("snapshot.csv");
         SnapshotWriter writer(csv_filename);
+
+
         if (writer.is_open()) {
-            for (auto& monitor:monitors) {
-                writer.flush_history(monitor->get_history());
+            for (auto &t : threads) {
+                writer.flush_history(t->monitor().get_history());
             }
             log->info("Wrote " + std::to_string(writer.written_rows()) + " rows to " + csv_filename);
         }
     }
 
-    /* ----------------------------------------------------------
-     * 11. Observer Statistics
-     * ----------------------------------------------------------*/
-    log->info("=== Alerts statistics ===");
-    log->info("CPU alerts: " + std::to_string(statis_obs->get_cpu_alert_count()));
-    log->info("MEM alerts: " + std::to_string(statis_obs->get_mem_alert_count()));
-
-    for (const auto& proc:procs) {
-        // C function
-        show_proc(&proc);
-    }
-
-    demo_stl(procs);
 
     demo_memory();
 

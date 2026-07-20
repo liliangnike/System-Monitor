@@ -21,8 +21,8 @@ public:
     MonitorThread& operator=(const MonitorThread&)  = delete;
 
     // move is ok
-    MonitorThread(const MonitorThread&&)            = default;
-    MonitorThread& operator=(const MonitorThread&&) = default;
+    MonitorThread(MonitorThread&&)                  = default;
+    MonitorThread& operator=(MonitorThread&&)       = default;
 
     void start();
     void stop();

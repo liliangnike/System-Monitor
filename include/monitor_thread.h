@@ -5,6 +5,7 @@
 #include <mutex>
 #include <atomic>
 #include <chrono>
+#include <condition_variable>
 #include "process_info.h"
 #include "monitor.h"
 
@@ -30,6 +31,9 @@ public:
     void join();
 
     bool is_running() { return running_.load();}
+
+    const MonitorBase& monitor() const { return *monitor_; }
+    MonitorBase& monitor() { return *monitor_; }
 
     const std::string& proc_name() const { return proc_name_; }
 private:

@@ -4,7 +4,7 @@
 MonitorThread::MonitorThread(process_info_t proc,
                  std::unique_ptr<MonitorBase> monitor,
                  std::chrono::milliseconds interval)
-    : proc_(proc), monitor_(monitor), interval_(interval), proc_name_(proc.name)
+    : proc_(proc), monitor_(std::move(monitor)), interval_(interval), proc_name_(proc.name)
 {
 }
 

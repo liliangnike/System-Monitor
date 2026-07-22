@@ -23,7 +23,7 @@
 // - complex code logic: std::mutex should be used
 static std::atomic<uint64_t> g_sample_count{0};
 
-class QueueAlertObserver : AlertObserver
+class QueueAlertObserver : public AlertObserver
 {
 public:
     explicit QueueAlertObserver(AlertQueue& q) : queue_(q) {}
@@ -110,11 +110,10 @@ int main(void)
      * 1. Initial logger instance - Singleton
      * ----------------------------------------------------------*/
 
-    Logger* log = Logger::instance();
-    log->set_loglevel(LogLevel::DEBUG);
-    log->set_log_file("system_monitor.log");
+    Logger::instance()->set_loglevel(LogLevel::DEBUG);
+    Logger::instance()->set_log_file("system_monitor.log");
     
-    log->info("=== System Monitor v3 Multi-threaded ===");
+    Logger::instance()->info("=== System Monitor v3 Multi-threaded ===");
 
     AlertQueue alert_queue;
 
@@ -177,7 +176,7 @@ int main(void)
     // AlertQueue contains mutex and condition_variable. Both could not be copied. So use reference in capture list
     // csv_writer_thread is sub-thread
     std::thread csv_writer_thread( [&alert_queue]() {
-        log->info("[CSVWriter] Thread started");
+        Logger::instance()->info("[CSVWriter] Thread started");
         SnapshotWriter writer("alerts.csv");
         while(true) {
             auto event = alert_queue.pop();
@@ -197,33 +196,33 @@ int main(void)
     // → pop() 返回 nullopt
     // → csv_writer_thread 退出循环，线程结束
 
-    log->info("Starting " + std::to_string(PROC_COUNT) + "monitor threads..." );
+    Logger::instance()->info("Starting " + std::to_string(PROC_COUNT) + "monitor threads..." );
     for (auto &t : threads) t->start();
 
-    log->info("Monitoring for 2 seconds...");
+    Logger::instance()->info("Monitoring for 2 seconds...");
     std::this_thread::sleep_for(std::chrono::seconds(2));
 
-    log->info("Stopping monitor threads...");
+    Logger::instance()->info("Stopping monitor threads...");
     for(auto &t : threads) t->stop();
 
-    log->info("Shutting down alert queue...");
+    Logger::instance()->info("Shutting down alert queue...");
     alert_queue.shutdown();
 
-    log->info("Waiting for CSV writer thread to finish...");
+    Logger::instance()->info("Waiting for CSV writer thread to finish...");
     csv_writer_thread.join();
 
     /* ----------------------------------------------------------
      * Observer Statistics
      * ----------------------------------------------------------*/
-    log->info("=== Results ===");
-    log->info("Total alerts: " + std::to_string(g_sample_count.load()));
-    log->info("CPU alerts: " + std::to_string(statis_obs->get_cpu_alert_count()));
-    log->info("MEM alerts: " + std::to_string(statis_obs->get_mem_alert_count()));
+    Logger::instance()->info("=== Results ===");
+    Logger::instance()->info("Total alerts: " + std::to_string(g_sample_count.load()));
+    Logger::instance()->info("CPU alerts: " + std::to_string(statis_obs->get_cpu_alert_count()));
+    Logger::instance()->info("MEM alerts: " + std::to_string(statis_obs->get_mem_alert_count()));
 
     /* ----------------------------------------------------------
      * Flush history data into csv file
      * ----------------------------------------------------------*/
-    log->info("=== Flush history to CSV ===");
+    Logger::instance()->info("=== Flush history to CSV ===");
     {
         std::string csv_filename("snapshot.csv");
         SnapshotWriter writer(csv_filename);
@@ -233,7 +232,7 @@ int main(void)
             for (auto &t : threads) {
                 writer.flush_history(t->monitor().get_history());
             }
-            log->info("Wrote " + std::to_string(writer.written_rows()) + " rows to " + csv_filename);
+            Logger::instance()->info("Wrote " + std::to_string(writer.written_rows()) + " rows to " + csv_filename);
         }
     }
 
@@ -244,10 +243,10 @@ int main(void)
     try {
         auto unknown_monitor = MonitorFactory::create("unknown_type");
     } catch (const std::invalid_argument& e) {
-        log->warn("Expected exception caught during monitor creation: " + std::string(e.what()));
+        Logger::instance()->warn("Expected exception caught during monitor creation: " + std::string(e.what()));
     }
 
-    log->info("=== Finished. Total log messages: " + std::to_string(log->get_message_count()) + " ===");
+    Logger::instance()->info("=== Finished. Total log messages: " + std::to_string(Logger::instance()->get_message_count()) + " ===");
 
 	return 0;
 }

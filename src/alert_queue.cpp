@@ -18,11 +18,13 @@ std::optional<AlertEvent> AlertQueue::pop()
 {
     // During life cycle of std::lock_guard, unlock the mutex is not allowed
     // std::unique_lock allows lock/unlock at any time
-    // And condition_variable wait() only use std::unique_lock.
+    // And condition_variable wait() only use std::unique_lock. Because wait() unlocks mutex firstly, after thread is invoke, then re-lock the mutex
     std::unique_lock<std::mutex> lk(mutex_);
 
     // The lambda function is to avoid Spurious Wakeup - Even though producer did not call notify_one(), OS might invoke the consumer thread
     cv_.wait(lk, [this]() { return !queue_.empty() || shutdown_; });
+
+    //reach here if the lambda function returns true
 
     if (queue_.empty()) return std::nullopt;
     AlertEvent event = queue_.front();

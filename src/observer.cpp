@@ -6,7 +6,11 @@
 void AlertSubject::subscribe(std::shared_ptr<AlertObserver> observer)
 {
     cleanup_expired_observers();
+   
+    // shared_ptr -> counter + 1, but vector is weak_ptr type, so no counter
     observers_.emplace_back(observer);
+    // push_back creates an object and the copy/move into the vector
+    // emplace_back copies a share_ptr?
 }
 
 void AlertSubject::unsubscribe(const std::string& name)

@@ -45,6 +45,15 @@ public:
 
 private:
     // Define weak_ptr type.
+    // Why not using shared_ptr directly?
+    // For example, in main function
+    // 1. stats_obs -> counter is 1
+    // 2. cpu_mon -> subscribe -> counter + 1 = 2
+    // 3. After main function execution, stats_obs is local and destroyed automatically. counter - 1 = 1
+    // 4. StatsAlertObserver will not be freed because counter is 1 now. Memory leak occurs.
+    // 5. weak_ptr does not have counter, so such issue
+    //
+    // In observer pattern, subject should not "own" life cycle of observers. So weak_ptr type should be used.
     std::vector<std::weak_ptr<AlertObserver>> observers_;
 };
 

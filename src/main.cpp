@@ -155,9 +155,14 @@ int main(void)
                                     // constexpr means that the variable can be calculated out during compilation phase
 
     // Why unique_ptr here (not thread objects)?
-    // MonitorThread contains std::thread that could not be copied
-    // When vector inserts new elements, existing elements need to be moved, and there are restrictions on mutex/condition_variable objects move
-    // unique_ptr just pointer move. It is safe.
+    // 1. MonitorThread contains std::thread that could not be copied
+    //  When vector inserts new elements, existing elements need to be moved, and there are restrictions on mutex/condition_variable objects move
+    //  unique_ptr just pointer move. It is safe.
+    // 2. Every element is the unique pointer of the associated thread. No anywhere else own the thread.
+    //
+    // unique_ptr -> own uniquely
+    // share_ptr -> many owners share same object
+    // weak_ptr -> Need to access but not own, no impact on the life cycle
     std::vector<std::unique_ptr<MonitorThread>> threads;
 
     for (int i = 0; i < PROC_COUNT; i++) {

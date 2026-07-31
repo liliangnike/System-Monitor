@@ -173,8 +173,13 @@ int main(void)
         cpu_mon->subscribe(queue_obs);
         cpu_mon->subscribe(console_obs);
         cpu_mon->subscribe(statis_obs);
-
         threads.push_back(std::make_unique<MonitorThread>(proc, std::move(cpu_mon), std::chrono::milliseconds(300)));
+
+        auto mem_mon = MonitorFactory::create(MonitorFactory::Type::MEMORY);
+        mem_mon->subscribe(queue_obs);
+        mem_mon->subscribe(console_obs);
+        mem_mon->subscribe(statis_obs);
+        threads.push_back(std::make_unique<MonitorThread>(proc, std::move(mem_mon), std::chrono::milliseconds(300)));
     }
 
     // lambda function as thread function
